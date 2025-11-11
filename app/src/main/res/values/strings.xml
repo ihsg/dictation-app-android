@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">听写小助手</string>
+    <string name="back">返回</string>
+    <string name="start">开始</string>
+    <string name="stop">停止</string>
+    <string name="last_one">上一个</string>
+    <string name="next_one">下一个</string>
+</resources>
