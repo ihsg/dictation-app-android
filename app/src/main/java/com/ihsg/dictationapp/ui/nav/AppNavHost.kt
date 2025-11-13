@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ihsg.dictationapp.ui.screens.PlayerScreenScreen
+import com.ihsg.dictationapp.ui.screens.PlayerSettingsScreen
 
 @Composable
 fun AppNavHost(
@@ -24,6 +25,12 @@ fun AppNavHost(
 
             composable(route = HomePage.path) {
                 PlayerScreenScreen()
+            }
+            composable(route = PlayerPage.path) {
+                PlayerScreenScreen()
+            }
+            composable(route = PlayerSettingsPage.path) {
+                PlayerSettingsScreen()
             }
         }
     }

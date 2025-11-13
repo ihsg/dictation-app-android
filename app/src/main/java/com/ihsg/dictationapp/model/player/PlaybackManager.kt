@@ -31,7 +31,7 @@ class PlaybackManager @Inject constructor(
     private val _wordList = MutableStateFlow<List<String>>(emptyList())
     val wordList: StateFlow<List<String>> = _wordList
 
-    private val _intervalTime = MutableStateFlow(3000L) // 默认3秒间隔
+    private val _intervalTime = MutableStateFlow(5000L) // 默认5秒间隔
     val intervalTime: StateFlow<Long> = _intervalTime
 
     private val _errorMessage = MutableStateFlow<String?>(null)

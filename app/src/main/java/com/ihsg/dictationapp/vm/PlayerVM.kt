@@ -2,23 +2,17 @@ package com.ihsg.dictationapp.vm
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ihsg.dictationapp.TextToSpeechManager
 import com.ihsg.dictationapp.model.log.Logger
 import com.ihsg.dictationapp.model.player.PlaybackManager
 import com.ihsg.dictationapp.model.player.PlaybackState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
 @HiltViewModel
-class HomeVM @Inject constructor(
+class PlayerVM @Inject constructor(
     private val playbackManager: PlaybackManager,
 ) : ViewModel() {
     private val logger = Logger(this)
