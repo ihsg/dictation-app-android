@@ -29,13 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ihsg.dictationapp.ui.components.TopBar
-import com.ihsg.dictationapp.vm.HomeVM
+import com.ihsg.dictationapp.vm.PlayerVM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerSettingsScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeVM = hiltViewModel()
+    viewModel: PlayerVM = hiltViewModel()
 ) {
 
     val intervalTime by viewModel.intervalTime.collectAsState()
@@ -64,7 +64,11 @@ fun PlayerSettingsScreen(
                     Column(
                         modifier = Modifier.padding(16.dp)
                     ) {
-                        Text("间隔时间设置", style = MaterialTheme.typography.titleMedium)
+                        Text(
+                            text = "间隔时间设置",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Row(
@@ -76,15 +80,17 @@ fun PlayerSettingsScreen(
                                 value = intervalText,
                                 onValueChange = {
                                     intervalText = it.filter { char -> char.isDigit() }
-                                    val seconds = intervalText.toIntOrNull() ?: 3
+                                    val seconds = intervalText.toIntOrNull() ?: 5
                                     viewModel.setIntervalTime(seconds * 1000L)
                                 },
+                                singleLine = true,
                                 modifier = Modifier.width(80.dp),
                                 suffix = { Text("秒") }
                             )
                         }
 
                         Spacer(modifier = Modifier.height(8.dp))
+
                         Slider(
                             value = (intervalTime / 1000).toFloat(),
                             onValueChange = {
@@ -92,8 +98,8 @@ fun PlayerSettingsScreen(
                                 intervalText = seconds.toString()
                                 viewModel.setIntervalTime(seconds * 1000L)
                             },
-                            valueRange = 1f..10f,
-                            steps = 8
+                            valueRange = 1f..60f,
+                            steps = 10
                         )
                     }
                 }
@@ -121,6 +127,7 @@ fun PlayerSettingsScreen(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Text("音调: ${"%.1f".format(pitch)}")
+
                         Slider(
                             value = pitch,
                             onValueChange = {
