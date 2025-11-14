@@ -37,11 +37,10 @@ fun PlayerSettingsScreen(
     modifier: Modifier = Modifier,
     viewModel: PlayerVM = hiltViewModel()
 ) {
-
     val intervalTime by viewModel.intervalTime.collectAsState()
-    var intervalText by remember { mutableStateOf((intervalTime / 1000).toString()) }
-    var speechRate by remember { mutableFloatStateOf(1.0f) }
-    var pitch by remember { mutableFloatStateOf(1.0f) }
+    val speechRate by viewModel.speechRate.collectAsState()
+    val pitch by viewModel.pitch.collectAsState()
+
 
     Scaffold(topBar = {
         TopBar(title = "播放器设置")
@@ -71,23 +70,7 @@ fun PlayerSettingsScreen(
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("间隔时间:")
-                            Spacer(modifier = Modifier.width(8.dp))
-                            OutlinedTextField(
-                                value = intervalText,
-                                onValueChange = {
-                                    intervalText = it.filter { char -> char.isDigit() }
-                                    val seconds = intervalText.toIntOrNull() ?: 5
-                                    viewModel.setIntervalTime(seconds * 1000L)
-                                },
-                                singleLine = true,
-                                modifier = Modifier.width(80.dp),
-                                suffix = { Text("秒") }
-                            )
-                        }
+                        Text("间隔时间: ${intervalTime / 1000L} 秒")
 
                         Spacer(modifier = Modifier.height(8.dp))
 
@@ -95,7 +78,6 @@ fun PlayerSettingsScreen(
                             value = (intervalTime / 1000).toFloat(),
                             onValueChange = {
                                 val seconds = it.toInt()
-                                intervalText = seconds.toString()
                                 viewModel.setIntervalTime(seconds * 1000L)
                             },
                             valueRange = 1f..60f,
@@ -117,7 +99,6 @@ fun PlayerSettingsScreen(
                         Slider(
                             value = speechRate,
                             onValueChange = {
-                                speechRate = it
                                 viewModel.setSpeechRate(it)
                             },
                             valueRange = 0.5f..2.0f,
@@ -131,7 +112,6 @@ fun PlayerSettingsScreen(
                         Slider(
                             value = pitch,
                             onValueChange = {
-                                pitch = it
                                 viewModel.setPitch(it)
                             },
                             valueRange = 0.5f..2.0f,

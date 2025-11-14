@@ -14,7 +14,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class PlaybackManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
@@ -31,8 +33,14 @@ class PlaybackManager @Inject constructor(
     private val _wordList = MutableStateFlow<List<String>>(emptyList())
     val wordList: StateFlow<List<String>> = _wordList
 
-    private val _intervalTime = MutableStateFlow(5000L) // 默认5秒间隔
+    private val _intervalTime = MutableStateFlow(5000L)
     val intervalTime: StateFlow<Long> = _intervalTime
+
+    private val _speechRate = MutableStateFlow(1f)
+    val speechRate: StateFlow<Float> = _speechRate
+
+    private val _pitch = MutableStateFlow(1f)
+    val pitch: StateFlow<Float> = _pitch
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
@@ -214,13 +222,16 @@ class PlaybackManager @Inject constructor(
 
     fun setSpeechRate(rate: Float) {
         textToSpeech?.setSpeechRate(rate)
+        _speechRate.value = rate
     }
 
     fun setPitch(pitch: Float) {
         textToSpeech?.setPitch(pitch)
+        _pitch.value = pitch
     }
 
     fun release() {
+        logger.w { "release callled" }
         job?.cancel()
         textToSpeech?.stop()
         textToSpeech?.shutdown()
