@@ -13,17 +13,13 @@ import com.ihsg.dictationapp.ui.nav.LocalNavHostController
 fun TopBar(
     title: String,
     modifier: Modifier = Modifier,
-    navigationIcon: @Composable (() -> Unit)? = null,
+    navigationIcon: @Composable (() -> Unit)={},
     actions: @Composable RowScope.() -> Unit = {},
 ) {
-    val navController = LocalNavHostController.current
-
     TopAppBar(
         title = { Text(text = title) },
         modifier = modifier,
-        navigationIcon = navigationIcon ?: {
-            ActionButton(onClick = { navController.popBackStack() })
-        },
+        navigationIcon = navigationIcon,
         actions = actions
     )
 }

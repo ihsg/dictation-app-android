@@ -28,7 +28,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.ihsg.dictationapp.ui.components.ActionButton
 import com.ihsg.dictationapp.ui.components.TopBar
+import com.ihsg.dictationapp.ui.nav.LocalNavHostController
 import com.ihsg.dictationapp.vm.PlayerVM
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,13 +39,20 @@ fun PlayerSettingsScreen(
     modifier: Modifier = Modifier,
     viewModel: PlayerVM = hiltViewModel()
 ) {
+    val navController = LocalNavHostController.current
     val intervalTime by viewModel.intervalTime.collectAsState()
     val speechRate by viewModel.speechRate.collectAsState()
     val pitch by viewModel.pitch.collectAsState()
 
 
     Scaffold(topBar = {
-        TopBar(title = "播放器设置")
+        TopBar(
+            title = "播放器设置",
+            navigationIcon = {
+                ActionButton(onClick = {
+                    navController.popBackStack()
+                })
+            })
     }) { paddingValues ->
         Column(
             modifier = modifier
