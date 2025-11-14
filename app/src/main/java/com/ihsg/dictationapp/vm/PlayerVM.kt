@@ -44,6 +44,21 @@ class PlayerVM @Inject constructor(
             3000L
         )
 
+    val speechRate = playbackManager.speechRate
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            1f
+        )
+
+    val pitch = playbackManager.pitch
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            1f
+        )
+
+
     fun initialize() {
         logger.i { "initialize called" }
         playbackManager.initialize()

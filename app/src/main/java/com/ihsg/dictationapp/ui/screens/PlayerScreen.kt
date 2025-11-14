@@ -27,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,15 +34,13 @@ import com.ihsg.dictationapp.model.player.PlaybackState
 import com.ihsg.dictationapp.ui.components.ActionButton
 import com.ihsg.dictationapp.ui.components.TopBar
 import com.ihsg.dictationapp.ui.icon.FilledIcons
-import com.ihsg.dictationapp.ui.nav.AppNavRoute
 import com.ihsg.dictationapp.ui.nav.LocalNavHostController
 import com.ihsg.dictationapp.ui.nav.PlayerSettingsPage
-import com.ihsg.dictationapp.ui.theme.DictationAppTheme
 import com.ihsg.dictationapp.vm.PlayerVM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlayerScreenScreen(
+fun PlayerScreen(
     modifier: Modifier = Modifier,
     viewModel: PlayerVM = hiltViewModel()
 ) {
@@ -60,6 +57,9 @@ fun PlayerScreenScreen(
     val playbackState by viewModel.playbackState.collectAsState()
     val currentWordIndex by viewModel.currentWordIndex.collectAsState()
     val wordList by viewModel.wordList.collectAsState()
+    val intervalTime by viewModel.intervalTime.collectAsState()
+    val speechRate by viewModel.speechRate.collectAsState()
+    val pitch by viewModel.pitch.collectAsState()
 
     LaunchedEffect(Unit) {
         if (wordList.isEmpty()) {
@@ -130,6 +130,35 @@ fun PlayerScreenScreen(
                         }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        modifier = Modifier.padding(top = 30.dp, bottom = 10.dp),
+                        text = "当前设置",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        text = "间隔时间: ${intervalTime / 1000L} 秒",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        text = "语音语速: ${"%.1f".format(speechRate)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        text = "语音音调: ${"%.1f".format(pitch)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
 
             // playing controller
@@ -195,14 +224,5 @@ fun PlayerScreenScreen(
                 }
             }
         }
-    }
-}
-
-
-@Preview
-@Composable
-fun PlayerScreenScreenPreview() {
-    DictationAppTheme {
-        PlayerScreenScreen()
     }
 }
