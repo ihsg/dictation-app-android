@@ -24,6 +24,7 @@ import com.ihsg.dictationapp.ui.components.ActionButton
 import com.ihsg.dictationapp.ui.components.FloatingActionBar
 import com.ihsg.dictationapp.ui.components.TopBar
 import com.ihsg.dictationapp.ui.nav.AddBookPageRoute
+import com.ihsg.dictationapp.ui.nav.AddGradePageRoute
 import com.ihsg.dictationapp.ui.nav.LocalNavHostController
 import com.ihsg.dictationapp.vm.GradeVM
 
@@ -51,7 +52,10 @@ fun GradeScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionBar(onClick = { navController.navigate(AddBookPageRoute.path) })
+            FloatingActionBar(
+                onClick = {
+                    navController.navigate(AddGradePageRoute.getPathWithArgs(bookId))
+                })
         }
     ) { paddingValues ->
         Column(
