@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.ihsg.dictationapp.ui.nav.AppNavArgs.ARG_ID
 import com.ihsg.dictationapp.ui.screens.AddBookScreen
+import com.ihsg.dictationapp.ui.screens.AddGradeScreen
 import com.ihsg.dictationapp.ui.screens.BookScreen
 import com.ihsg.dictationapp.ui.screens.GradeScreen
 import com.ihsg.dictationapp.ui.screens.PlayerScreen
@@ -44,6 +45,13 @@ fun AppNavHost(
                 arguments = GradePageRoute.getArguments()
             ) {
                 GradeScreen(bookId = GradePageRoute.getBookId(it.arguments))
+            }
+
+            composable(
+                route = AddGradePageRoute.path,
+                arguments = AddGradePageRoute.getArguments()
+            ) {
+                AddGradeScreen(bookId = AddGradePageRoute.getBookId(it.arguments))
             }
 
             composable(route = PlayerPage.path) {
