@@ -49,10 +49,12 @@ fun BookScreen(
 
     Scaffold(
         topBar = {
-            TopBar(title = "听写小助手")
+            TopBar(title = "教材列表")
         },
         floatingActionButton = {
-            FloatingActionBar(onClick = { navController.navigate(AddBookPageRoute.path) })
+            FloatingActionBar(onClick = {
+                navController.navigate(AddBookPageRoute.path)
+            })
         }
     ) { paddingValues ->
         Column(
@@ -61,7 +63,7 @@ fun BookScreen(
                 .padding(paddingValues)
         ) {
             LazyColumn(
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier.padding(horizontal = 24.dp),
                 contentPadding = PaddingValues(vertical = 10.dp),
             ) {
                 items(books, key = { it.id }) { book ->

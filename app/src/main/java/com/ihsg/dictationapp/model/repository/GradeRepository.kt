@@ -8,5 +8,5 @@ interface GradeRepository {
 
     suspend fun loadAll(bookId: Long): List<GradeEntity>?
 
-    suspend fun loadById(bookId: Long, id: Long): GradeEntity?
+    suspend fun loadById(bookId: Long, gradeId: Long): GradeEntity?
 }

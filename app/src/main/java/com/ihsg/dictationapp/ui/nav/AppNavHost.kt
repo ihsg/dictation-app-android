@@ -3,16 +3,15 @@ package com.ihsg.dictationapp.ui.nav
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.ihsg.dictationapp.ui.nav.AppNavArgs.ARG_ID
 import com.ihsg.dictationapp.ui.screens.AddBookScreen
 import com.ihsg.dictationapp.ui.screens.AddGradeScreen
+import com.ihsg.dictationapp.ui.screens.AddLessonScreen
 import com.ihsg.dictationapp.ui.screens.BookScreen
 import com.ihsg.dictationapp.ui.screens.GradeScreen
+import com.ihsg.dictationapp.ui.screens.LessonScreen
 import com.ihsg.dictationapp.ui.screens.PlayerScreen
 import com.ihsg.dictationapp.ui.screens.PlayerSettingsScreen
 
@@ -52,6 +51,26 @@ fun AppNavHost(
                 arguments = AddGradePageRoute.getArguments()
             ) {
                 AddGradeScreen(bookId = AddGradePageRoute.getBookId(it.arguments))
+            }
+
+            composable(
+                route = LessonPageRoute.path,
+                arguments = LessonPageRoute.getArguments()
+            ) {
+                LessonScreen(
+                    bookId = LessonPageRoute.getBookId(it.arguments),
+                    gradeId = LessonPageRoute.getGradeId(it.arguments)
+                )
+            }
+
+            composable(
+                route = AddLessonPageRoute.path,
+                arguments = AddLessonPageRoute.getArguments()
+            ) {
+                AddLessonScreen(
+                    bookId = AddLessonPageRoute.getBookId(it.arguments),
+                    gradeId = AddLessonPageRoute.getGradeId(it.arguments)
+                )
             }
 
             composable(route = PlayerPage.path) {

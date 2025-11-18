@@ -15,7 +15,7 @@ class GradeRepositoryImpl @Inject constructor(
         return gradeDao.loadAll(bookId)
     }
 
-    override suspend fun loadById(bookId: Long, id: Long): GradeEntity? {
-        return gradeDao.loadById(bookId, id)
+    override suspend fun loadById(bookId: Long, gradeId: Long): GradeEntity? {
+        return gradeDao.loadById(bookId, gradeId)
     }
 }

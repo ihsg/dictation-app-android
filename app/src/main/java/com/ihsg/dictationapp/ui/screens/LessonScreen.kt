@@ -29,41 +29,39 @@ import com.ihsg.dictationapp.ui.components.ActionButton
 import com.ihsg.dictationapp.ui.components.FloatingActionBar
 import com.ihsg.dictationapp.ui.components.TopBar
 import com.ihsg.dictationapp.ui.nav.AddGradePageRoute
-import com.ihsg.dictationapp.ui.nav.LessonPageRoute
+import com.ihsg.dictationapp.ui.nav.AddLessonPageRoute
 import com.ihsg.dictationapp.ui.nav.LocalNavHostController
-import com.ihsg.dictationapp.vm.GradeVM
+import com.ihsg.dictationapp.vm.LessonVM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GradeScreen(
+fun LessonScreen(
     bookId: Long,
+    gradeId: Long,
     modifier: Modifier = Modifier,
-    viewModel: GradeVM = hiltViewModel()
+    viewModel: LessonVM = hiltViewModel()
 ) {
     val navController = LocalNavHostController.current
 
     val book by viewModel.bookStateFlow.collectAsState()
-    val grades by viewModel.gradesStateFlow.collectAsState()
+    val grade by viewModel.gradeStateFlow.collectAsState()
+    val lessons by viewModel.lessonsStateFlow.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.load(bookId)
+        viewModel.load(bookId, gradeId)
     }
 
     Scaffold(
         topBar = {
             TopBar(
-                title = "年级列表",
-                navigationIcon = {
-                    ActionButton(onClick = {
-                        navController.popBackStack()
-                    })
-                }
+                title = "课程列表",
+                navigationIcon = { ActionButton(onClick = { navController.popBackStack() }) }
             )
         },
         floatingActionButton = {
             FloatingActionBar(
                 onClick = {
-                    navController.navigate(AddGradePageRoute.getPathWithArgs(bookId))
+                    navController.navigate(AddLessonPageRoute.getPathWithArgs(bookId, gradeId))
                 })
         }
     ) { paddingValues ->
@@ -72,11 +70,16 @@ fun GradeScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            Text(
+                text = "${book?.name} > ${grade?.name}",
+                modifier = Modifier.padding(horizontal = 24.dp)
+            )
             LazyColumn(
                 modifier = Modifier.padding(horizontal = 24.dp),
                 contentPadding = PaddingValues(vertical = 10.dp),
             ) {
-                items(grades, key = { it.id }) { grade ->
+
+                items(lessons, key = { it.id }) { lesson ->
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -84,15 +87,15 @@ fun GradeScreen(
                             .wrapContentHeight(Alignment.CenterVertically)
                             .clickable {
                                 navController.navigate(
-                                    LessonPageRoute.getPathWithArgs(
+                                    AddLessonPageRoute.getPathWithArgs(
                                         bookId = bookId,
-                                        gradeId = grade.id
+                                        gradeId = gradeId
                                     )
                                 )
                             },
                     ) {
                         Text(
-                            text = grade.name,
+                            text = lesson.name,
                             fontWeight = FontWeight.Normal,
                             fontSize = 18.sp,
                         )

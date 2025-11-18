@@ -40,22 +40,25 @@ import com.ihsg.dictationapp.ui.components.TopBar
 import com.ihsg.dictationapp.ui.nav.AddBookPageRoute
 import com.ihsg.dictationapp.ui.nav.LocalNavHostController
 import com.ihsg.dictationapp.vm.AddGradeVM
+import com.ihsg.dictationapp.vm.AddLessonVM
 import com.ihsg.dictationapp.vm.GradeVM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddGradeScreen(
+fun AddLessonScreen(
     bookId: Long,
+    gradeId: Long,
     modifier: Modifier = Modifier,
-    viewModel: AddGradeVM = hiltViewModel()
+    viewModel: AddLessonVM = hiltViewModel()
 ) {
     val navController = LocalNavHostController.current
     val book by viewModel.bookStateFlow.collectAsState()
+    val grade by viewModel.gradeStateFlow.collectAsState()
     val pageState by viewModel.pageStateFlow.collectAsState()
     var text by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
-        viewModel.load(bookId)
+        viewModel.load(bookId, gradeId)
     }
 
     LaunchedEffect(pageState) {
@@ -67,12 +70,8 @@ fun AddGradeScreen(
     Scaffold(
         topBar = {
             TopBar(
-                title = "添加册数",
-                navigationIcon = {
-                    ActionButton(onClick = {
-                        navController.popBackStack()
-                    })
-                }
+                title = "添加课程",
+                navigationIcon = { ActionButton(onClick = { navController.popBackStack() }) }
             )
         },
     ) { paddingValues ->
@@ -83,7 +82,7 @@ fun AddGradeScreen(
         ) {
 
             Text(
-                text = book?.name ?: "",
+                text = "${book?.name} > ${grade?.name}",
                 modifier = Modifier.padding(24.dp)
             )
 
@@ -92,7 +91,7 @@ fun AddGradeScreen(
                     modifier = Modifier.padding(24.dp)
                 ) {
                     Text(
-                        "册数名称",
+                        "课程名称",
                         style = MaterialTheme.typography.titleMedium
                     )
 
@@ -118,7 +117,7 @@ fun AddGradeScreen(
                             ) {
                                 if (text.isEmpty()) {
                                     Text(
-                                        "请输入要添加的册数名称，例如：五年级上册",
+                                        "请输入要添加的课程名称，例如：第1课 白鹭",
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         fontSize = 16.sp
                                     )
@@ -132,7 +131,7 @@ fun AddGradeScreen(
 
                     Button(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = { viewModel.add(bookId, text) }) {
+                        onClick = { viewModel.add(gradeId, text) }) {
                         Text(text = "添加")
                     }
                 }
