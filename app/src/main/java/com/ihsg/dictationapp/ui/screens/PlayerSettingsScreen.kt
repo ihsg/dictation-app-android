@@ -31,29 +31,30 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.ihsg.dictationapp.ui.components.ActionButton
 import com.ihsg.dictationapp.ui.components.TopBar
 import com.ihsg.dictationapp.ui.nav.LocalNavHostController
+import com.ihsg.dictationapp.vm.PlayerSettingsVM
 import com.ihsg.dictationapp.vm.PlayerVM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerSettingsScreen(
     modifier: Modifier = Modifier,
-    viewModel: PlayerVM = hiltViewModel()
+    viewModel: PlayerSettingsVM = hiltViewModel()
 ) {
     val navController = LocalNavHostController.current
     val intervalTime by viewModel.intervalTime.collectAsState()
     val speechRate by viewModel.speechRate.collectAsState()
     val pitch by viewModel.pitch.collectAsState()
 
-
-    Scaffold(topBar = {
-        TopBar(
-            title = "播放器设置",
-            navigationIcon = {
-                ActionButton(onClick = {
-                    navController.popBackStack()
+    Scaffold(
+        topBar = {
+            TopBar(
+                title = "播放器设置",
+                navigationIcon = {
+                    ActionButton(onClick = {
+                        navController.popBackStack()
+                    })
                 })
-            })
-    }) { paddingValues ->
+        }) { paddingValues ->
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -89,8 +90,8 @@ fun PlayerSettingsScreen(
                                 val seconds = it.toInt()
                                 viewModel.setIntervalTime(seconds * 1000L)
                             },
-                            valueRange = 1f..60f,
-                            steps = 10
+                            valueRange = 1f..20f,
+                            steps = 19
                         )
                     }
                 }

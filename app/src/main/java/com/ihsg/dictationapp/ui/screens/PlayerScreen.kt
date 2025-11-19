@@ -30,6 +30,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import com.ihsg.dictationapp.model.player.PlaybackState
 import com.ihsg.dictationapp.ui.components.ActionButton
 import com.ihsg.dictationapp.ui.components.TopBar
@@ -41,18 +43,17 @@ import com.ihsg.dictationapp.vm.PlayerVM
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerScreen(
+    bookId: Long,
+    gradeId: Long,
+    lessonId: Long,
     modifier: Modifier = Modifier,
     viewModel: PlayerVM = hiltViewModel()
 ) {
     val navController = LocalNavHostController.current
 
-    // 示例单词列表
-    val sampleWords = remember {
-        listOf(
-            "apple", "banana", "computer", "dictionary", "elephant",
-            "fantastic", "garden", "happiness", "internet", "journey"
-        )
-    }
+    val book by viewModel.bookStateFlow.collectAsState()
+    val grade by viewModel.gradeStateFlow.collectAsState()
+    val lesson by viewModel.lessonStateFlow.collectAsState()
 
     val playbackState by viewModel.playbackState.collectAsState()
     val currentWordIndex by viewModel.currentWordIndex.collectAsState()
@@ -61,21 +62,21 @@ fun PlayerScreen(
     val speechRate by viewModel.speechRate.collectAsState()
     val pitch by viewModel.pitch.collectAsState()
 
-    LaunchedEffect(Unit) {
-        if (wordList.isEmpty()) {
-            viewModel.initialize()
-            viewModel.setWords(sampleWords)
-        }
+    LifecycleEventEffect(event = Lifecycle.Event.ON_CREATE) {
+        viewModel.initialize(bookId, gradeId, lessonId)
     }
 
-    Scaffold(topBar = {
-        TopBar(title = "播放器",
-            actions = {
-                ActionButton(imageVector = FilledIcons.Settings) {
-                    navController.navigate(PlayerSettingsPage.path)
-                }
-            })
-    }) { paddingValues ->
+    Scaffold(
+        topBar = {
+            TopBar(
+                title = "听写播放器",
+                navigationIcon = { ActionButton(onClick = { navController.popBackStack() }) },
+                actions = {
+                    ActionButton(imageVector = FilledIcons.Settings) {
+                        navController.navigate(PlayerSettingsPage.path)
+                    }
+                })
+        }) { paddingValues ->
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -90,9 +91,15 @@ fun PlayerScreen(
             ) {
 
                 Text(
-                    text = "第1课 白鹭",
+                    text = "${book?.name} > ${grade?.name}",
+                    modifier = Modifier.fillMaxWidth(),
+                    fontWeight = FontWeight.Bold,
+                )
+
+                Text(
+                    text = lesson?.name ?: "",
                     style = MaterialTheme.typography.displayLarge,
-                    fontWeight = FontWeight.Normal,
+                    fontWeight = FontWeight.Bold,
                     fontSize = 26.sp
                 )
 
@@ -106,7 +113,7 @@ fun PlayerScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = wordList.getOrNull(currentWordIndex) ?: "暂无单词",
+                            text = wordList.getOrNull(currentWordIndex)?.tips ?: "暂无单词",
                             style = MaterialTheme.typography.displayLarge,
                             fontWeight = FontWeight.Bold,
                             fontSize = 60.sp
@@ -123,7 +130,7 @@ fun PlayerScreen(
 
                             Text(
                                 text = "${currentWordIndex + 1} / ${wordList.size}",
-                                style = MaterialTheme.typography.bodySmall,
+                                style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(start = 8.dp)
                             )

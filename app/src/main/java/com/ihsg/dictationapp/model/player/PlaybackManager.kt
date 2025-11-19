@@ -3,6 +3,7 @@ package com.ihsg.dictationapp.model.player
 import android.content.Context
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import com.ihsg.dictationapp.model.db.entity.WordEntity
 import com.ihsg.dictationapp.model.log.Logger
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -30,8 +31,8 @@ class PlaybackManager @Inject constructor(
     private val _currentWordIndex = MutableStateFlow(0)
     val currentWordIndex: StateFlow<Int> = _currentWordIndex
 
-    private val _wordList = MutableStateFlow<List<String>>(emptyList())
-    val wordList: StateFlow<List<String>> = _wordList
+    private val _wordList = MutableStateFlow<List<WordEntity>>(emptyList())
+    val wordList: StateFlow<List<WordEntity>> = _wordList
 
     private val _intervalTime = MutableStateFlow(5000L)
     val intervalTime: StateFlow<Long> = _intervalTime
@@ -50,7 +51,7 @@ class PlaybackManager @Inject constructor(
             logger.d { "initialize called: status=$status" }
 
             if (status == TextToSpeech.SUCCESS) {
-                setLanguage(Locale.US)
+                setLanguage(Locale.CHINESE)
                 setupUtteranceListener()
             }
         }
@@ -84,7 +85,7 @@ class PlaybackManager @Inject constructor(
         return textToSpeech?.setLanguage(locale) == TextToSpeech.LANG_AVAILABLE
     }
 
-    fun setWords(words: List<String>) {
+    fun setWords(words: List<WordEntity>) {
         _wordList.value = words
         _currentWordIndex.value = 0
         _playbackState.value = PlaybackState.STOPPED
@@ -185,7 +186,7 @@ class PlaybackManager @Inject constructor(
         val word = _wordList.value.getOrNull(_currentWordIndex.value) ?: return
 
         val result = textToSpeech?.speak(
-            word,
+            word.word,
             TextToSpeech.QUEUE_FLUSH,
             null,
             "word_${_currentWordIndex.value}"

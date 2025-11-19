@@ -96,9 +96,17 @@ fun AppNavHost(
                 )
             }
 
-            composable(route = PlayerPage.path) {
-                PlayerScreen()
+            composable(
+                route = PlayerPageRoute.path,
+                arguments = PlayerPageRoute.getArguments()
+            ) {
+                PlayerScreen(
+                    bookId = PlayerPageRoute.getBookId(it.arguments),
+                    gradeId = PlayerPageRoute.getGradeId(it.arguments),
+                    lessonId = PlayerPageRoute.getLessonId(it.arguments)
+                )
             }
+
             composable(route = PlayerSettingsPage.path) {
                 PlayerSettingsScreen()
             }
