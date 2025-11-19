@@ -6,21 +6,25 @@ import com.ihsg.dictationapp.model.config.PageState
 import com.ihsg.dictationapp.model.db.entity.BookEntity
 import com.ihsg.dictationapp.model.db.entity.GradeEntity
 import com.ihsg.dictationapp.model.db.entity.LessonEntity
+import com.ihsg.dictationapp.model.db.entity.WordEntity
 import com.ihsg.dictationapp.model.log.Logger
 import com.ihsg.dictationapp.model.repository.BookRepository
 import com.ihsg.dictationapp.model.repository.GradeRepository
 import com.ihsg.dictationapp.model.repository.LessonRepository
+import com.ihsg.dictationapp.model.repository.WordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AddLessonVM @Inject constructor(
+class AddWordVM @Inject constructor(
     private val bookRepository: BookRepository,
     private val gradeRepository: GradeRepository,
     private val lessonRepository: LessonRepository,
+    private val wordRepository: WordRepository,
 ) : ViewModel() {
     private val logger = Logger(this)
 
@@ -30,28 +34,56 @@ class AddLessonVM @Inject constructor(
     private val _gradeStateFlow = MutableStateFlow<GradeEntity?>(null)
     val gradeStateFlow = _gradeStateFlow.asStateFlow()
 
+    private val _lessonStateFlow = MutableStateFlow<LessonEntity?>(null)
+    val lessonStateFlow = _lessonStateFlow.asStateFlow()
+
     private val _pageStateFlow = MutableStateFlow<PageState>(PageState.Initial)
     val pageStateFlow = _pageStateFlow.asStateFlow()
 
-    fun load(bookId: Long, gradeId: Long) {
+    fun load(bookId: Long, gradeId: Long, lessonId: Long) {
         viewModelScope.launch {
-            _bookStateFlow.value = bookRepository.loadById(bookId)
-            _gradeStateFlow.value = gradeRepository.loadById(bookId, gradeId)
+            val bookDeferred = async { bookRepository.loadById(bookId) }
+            val gradeDeferred = async { gradeRepository.loadById(bookId, gradeId) }
+            val lessonDeferred = async { lessonRepository.loadById(bookId, gradeId, lessonId) }
+
+            _bookStateFlow.value = bookDeferred.await()
+            _gradeStateFlow.value = gradeDeferred.await()
+            _lessonStateFlow.value = lessonDeferred.await()
         }
     }
 
-    fun add(bookId: Long, gradeId: Long, lessonName: String) {
+    fun add(
+        bookId: Long,
+        gradeId: Long,
+        lessonId: Long,
+        word: String,
+        tips: String,
+        count: String
+    ) {
         viewModelScope.launch {
-            if (lessonName.isBlank()) {
-                logger.e { "the lesson name is null or empty" }
+            if (word.isBlank()) {
+                logger.e { "the word is null or empty" }
                 return@launch
             }
 
-            lessonRepository.add(
-                LessonEntity(
+            if (tips.isBlank()) {
+                logger.e { "the tips is null or empty" }
+                return@launch
+            }
+
+            if (count.isBlank()) {
+                logger.e { "the count is null or empty" }
+                return@launch
+            }
+
+            wordRepository.add(
+                WordEntity(
                     bookId = bookId,
                     gradeId = gradeId,
-                    name = lessonName
+                    lessonId = lessonId,
+                    word = word,
+                    tips = tips,
+                    count = count
                 )
             )
 

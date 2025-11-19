@@ -14,6 +14,7 @@ import com.ihsg.dictationapp.ui.screens.GradeScreen
 import com.ihsg.dictationapp.ui.screens.LessonScreen
 import com.ihsg.dictationapp.ui.screens.PlayerScreen
 import com.ihsg.dictationapp.ui.screens.PlayerSettingsScreen
+import com.ihsg.dictationapp.ui.screens.WordScreen
 
 @Composable
 fun AppNavHost(
@@ -70,6 +71,28 @@ fun AppNavHost(
                 AddLessonScreen(
                     bookId = AddLessonPageRoute.getBookId(it.arguments),
                     gradeId = AddLessonPageRoute.getGradeId(it.arguments)
+                )
+            }
+
+            composable(
+                route = WordPageRoute.path,
+                arguments = WordPageRoute.getArguments()
+            ) {
+                WordScreen(
+                    bookId = WordPageRoute.getBookId(it.arguments),
+                    gradeId = WordPageRoute.getGradeId(it.arguments),
+                    lessonId = WordPageRoute.getLessonId(it.arguments)
+                )
+            }
+
+            composable(
+                route = AddWordPageRoute.path,
+                arguments = AddWordPageRoute.getArguments()
+            ) {
+                AddLessonScreen(
+                    bookId = AddWordPageRoute.getBookId(it.arguments),
+                    gradeId = AddWordPageRoute.getGradeId(it.arguments),
+                    lessonId = AddWordPageRoute.getLessonId(it.arguments)
                 )
             }
 

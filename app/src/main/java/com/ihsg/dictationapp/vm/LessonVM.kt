@@ -35,7 +35,7 @@ class LessonVM @Inject constructor(
         viewModelScope.launch {
             val bookDeferred = async { bookRepository.loadById(bookId) }
             val gradeDeferred = async { gradeRepository.loadById(bookId, gradeId) }
-            val lessonsDeferred = async { lessonRepository.loadAll(gradeId) }
+            val lessonsDeferred = async { lessonRepository.loadAll(bookId, gradeId) }
             _bookStateFlow.value = bookDeferred.await()
             _gradeStateFlow.value = gradeDeferred.await()
             _lessonsStateFlow.value = lessonsDeferred.await().orEmpty()

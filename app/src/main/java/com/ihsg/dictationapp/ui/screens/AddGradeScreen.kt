@@ -128,7 +128,7 @@ fun AddGradeScreen(
                         }
                     )
 
-                    Spacer(modifier = Modifier.height(30.dp))
+                    Spacer(modifier = Modifier.height(60.dp))
 
                     Button(
                         modifier = Modifier.fillMaxWidth(),

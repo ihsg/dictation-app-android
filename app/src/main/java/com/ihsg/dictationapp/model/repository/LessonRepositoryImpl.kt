@@ -11,11 +11,11 @@ class LessonRepositoryImpl @Inject constructor(
         lessonDao.insert(lessonEntity)
     }
 
-    override suspend fun loadAll(gradeId: Long): List<LessonEntity>? {
-        return lessonDao.loadAll(gradeId)
+    override suspend fun loadAll(bookId: Long, gradeId: Long): List<LessonEntity>? {
+        return lessonDao.loadAll(bookId, gradeId)
     }
 
-    override suspend fun loadById(gradeId: Long, id: Long): LessonEntity? {
-        return lessonDao.loadById(gradeId, id)
+    override suspend fun loadById(bookId: Long, gradeId: Long, id: Long): LessonEntity? {
+        return lessonDao.loadById(bookId, gradeId, id)
     }
 }

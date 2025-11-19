@@ -6,5 +6,5 @@ interface WordRepository {
 
     suspend fun add(wordEntity: WordEntity)
 
-    suspend fun loadAll(lessonId: Long): List<WordEntity>?
+    suspend fun loadAll(bookId: Long, gradeId: Long, lessonId: Long): List<WordEntity>?
 }

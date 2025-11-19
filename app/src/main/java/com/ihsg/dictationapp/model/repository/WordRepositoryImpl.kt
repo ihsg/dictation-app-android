@@ -11,7 +11,7 @@ class WordRepositoryImpl @Inject constructor(
         wordDao.insert(wordEntity)
     }
 
-    override suspend fun loadAll(lessonId: Long): List<WordEntity>? {
-        return wordDao.loadAll(lessonId)
+    override suspend fun loadAll(bookId: Long, gradeId: Long, lessonId: Long): List<WordEntity>? {
+        return wordDao.loadAll(bookId, gradeId, lessonId)
     }
 }

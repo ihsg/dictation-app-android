@@ -31,6 +31,7 @@ import com.ihsg.dictationapp.ui.components.TopBar
 import com.ihsg.dictationapp.ui.nav.AddGradePageRoute
 import com.ihsg.dictationapp.ui.nav.AddLessonPageRoute
 import com.ihsg.dictationapp.ui.nav.LocalNavHostController
+import com.ihsg.dictationapp.ui.nav.WordPageRoute
 import com.ihsg.dictationapp.vm.LessonVM
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,7 +62,12 @@ fun LessonScreen(
         floatingActionButton = {
             FloatingActionBar(
                 onClick = {
-                    navController.navigate(AddLessonPageRoute.getPathWithArgs(bookId, gradeId))
+                    navController.navigate(
+                        AddLessonPageRoute.getPathWithArgs(
+                            bookId = bookId,
+                            gradeId = gradeId
+                        )
+                    )
                 })
         }
     ) { paddingValues ->
@@ -72,8 +78,10 @@ fun LessonScreen(
         ) {
             Text(
                 text = "${book?.name} > ${grade?.name}",
-                modifier = Modifier.padding(horizontal = 24.dp)
+                modifier = Modifier.padding(horizontal = 24.dp),
+                fontWeight = FontWeight.Bold,
             )
+
             LazyColumn(
                 modifier = Modifier.padding(horizontal = 24.dp),
                 contentPadding = PaddingValues(vertical = 10.dp),
@@ -87,9 +95,10 @@ fun LessonScreen(
                             .wrapContentHeight(Alignment.CenterVertically)
                             .clickable {
                                 navController.navigate(
-                                    AddLessonPageRoute.getPathWithArgs(
+                                    WordPageRoute.getPathWithArgs(
                                         bookId = bookId,
-                                        gradeId = gradeId
+                                        gradeId = gradeId,
+                                        lessonId = lesson.id
                                     )
                                 )
                             },

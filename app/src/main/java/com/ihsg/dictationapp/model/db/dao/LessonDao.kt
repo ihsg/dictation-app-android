@@ -15,9 +15,9 @@ interface LessonDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(lessonEntity: LessonEntity)
 
-    @Query("SELECT * FROM lesson WHERE grade_id = :gradeId")
-    suspend fun loadAll(gradeId: Long): List<LessonEntity>?
+    @Query("SELECT * FROM lesson WHERE book_id = :bookId AND grade_id = :gradeId")
+    suspend fun loadAll(bookId:Long, gradeId: Long): List<LessonEntity>?
 
-    @Query("SELECT * FROM lesson WHERE grade_id = :gradeId AND id = :id")
-    suspend fun loadById(gradeId: Long, id: Long): LessonEntity?
+    @Query("SELECT * FROM lesson WHERE book_id = :bookId AND grade_id = :gradeId AND id = :lessonId")
+    suspend fun loadById(bookId:Long, gradeId: Long, lessonId: Long): LessonEntity?
 }

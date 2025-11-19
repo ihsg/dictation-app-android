@@ -6,7 +6,7 @@ interface LessonRepository {
 
     suspend fun add(lessonEntity: LessonEntity)
 
-    suspend fun loadAll(gradeId: Long): List<LessonEntity>?
+    suspend fun loadAll(bookId: Long, gradeId: Long): List<LessonEntity>?
 
-    suspend fun loadById(gradeId: Long, id: Long): LessonEntity?
+    suspend fun loadById(bookId: Long, gradeId: Long, id: Long): LessonEntity?
 }

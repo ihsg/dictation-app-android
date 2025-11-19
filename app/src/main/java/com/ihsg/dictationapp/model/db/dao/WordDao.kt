@@ -15,6 +15,6 @@ interface WordDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(wordEntity: WordEntity)
 
-    @Query("SELECT * from word WHERE lesson_id = :lessonId")
-    suspend fun loadAll(lessonId: Long): List<WordEntity>?
+    @Query("SELECT * from word WHERE book_id = :bookId AND grade_id = :gradeId AND lesson_id = :lessonId")
+    suspend fun loadAll(bookId: Long, gradeId: Long, lessonId: Long): List<WordEntity>?
 }

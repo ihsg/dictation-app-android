@@ -12,6 +12,9 @@ data class LessonEntity(
     @ColumnInfo(name = "id")
     val id: Long = 0,
 
+    @ColumnInfo(name = "book_id")
+    val bookId: Long,
+
     @ColumnInfo(name = "grade_id")
     val gradeId: Long,
 

@@ -18,6 +18,6 @@ interface GradeDao {
     @Query("SELECT * FROM grade where bookId = :bookId")
     suspend fun loadAll(bookId: Long): List<GradeEntity>?
 
-    @Query("SELECT * FROM grade where bookId = :bookId AND id = :id")
-    suspend fun loadById(bookId: Long, id: Long): GradeEntity?
+    @Query("SELECT * FROM grade where bookId = :bookId AND id = :gradeId")
+    suspend fun loadById(bookId: Long, gradeId: Long): GradeEntity?
 }

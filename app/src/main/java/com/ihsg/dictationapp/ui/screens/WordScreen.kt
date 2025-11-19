@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,41 +30,49 @@ import com.ihsg.dictationapp.ui.components.ActionButton
 import com.ihsg.dictationapp.ui.components.FloatingActionBar
 import com.ihsg.dictationapp.ui.components.TopBar
 import com.ihsg.dictationapp.ui.nav.AddGradePageRoute
-import com.ihsg.dictationapp.ui.nav.LessonPageRoute
+import com.ihsg.dictationapp.ui.nav.AddLessonPageRoute
+import com.ihsg.dictationapp.ui.nav.AddWordPageRoute
 import com.ihsg.dictationapp.ui.nav.LocalNavHostController
-import com.ihsg.dictationapp.vm.GradeVM
+import com.ihsg.dictationapp.vm.LessonVM
+import com.ihsg.dictationapp.vm.WordVM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GradeScreen(
+fun WordScreen(
     bookId: Long,
+    gradeId: Long,
+    lessonId: Long,
     modifier: Modifier = Modifier,
-    viewModel: GradeVM = hiltViewModel()
+    viewModel: WordVM = hiltViewModel()
 ) {
     val navController = LocalNavHostController.current
 
     val book by viewModel.bookStateFlow.collectAsState()
-    val grades by viewModel.gradesStateFlow.collectAsState()
+    val grade by viewModel.gradeStateFlow.collectAsState()
+    val lesson by viewModel.lessonStateFlow.collectAsState()
+    val words by viewModel.wordsStateFlow.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.load(bookId)
+        viewModel.load(bookId, gradeId, lessonId)
     }
 
     Scaffold(
         topBar = {
             TopBar(
-                title = "年级列表",
-                navigationIcon = {
-                    ActionButton(onClick = {
-                        navController.popBackStack()
-                    })
-                }
+                title = "词语列表",
+                navigationIcon = { ActionButton(onClick = { navController.popBackStack() }) }
             )
         },
         floatingActionButton = {
             FloatingActionBar(
                 onClick = {
-                    navController.navigate(AddGradePageRoute.getPathWithArgs(bookId))
+                    navController.navigate(
+                        AddWordPageRoute.getPathWithArgs(
+                            bookId = bookId,
+                            gradeId = gradeId,
+                            lessonId = lessonId
+                        )
+                    )
                 })
         }
     ) { paddingValues ->
@@ -73,32 +82,32 @@ fun GradeScreen(
                 .padding(paddingValues)
         ) {
             Text(
-                text = "${book?.name}",
+                text = "${book?.name} > ${grade?.name} > ${lesson?.name}",
                 modifier = Modifier.padding(horizontal = 24.dp),
                 fontWeight = FontWeight.Bold,
             )
-
             LazyColumn(
                 modifier = Modifier.padding(horizontal = 24.dp),
                 contentPadding = PaddingValues(vertical = 10.dp),
             ) {
-                items(grades, key = { it.id }) { grade ->
-                    Box(
+
+                items(words, key = { it.id }) { word ->
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(60.dp)
                             .wrapContentHeight(Alignment.CenterVertically)
                             .clickable {
                                 navController.navigate(
-                                    LessonPageRoute.getPathWithArgs(
+                                    AddLessonPageRoute.getPathWithArgs(
                                         bookId = bookId,
-                                        gradeId = grade.id
+                                        gradeId = gradeId
                                     )
                                 )
                             },
                     ) {
                         Text(
-                            text = grade.name,
+                            text = "${word.word} (${word.tips}) (${word.count})",
                             fontWeight = FontWeight.Normal,
                             fontSize = 18.sp,
                         )
