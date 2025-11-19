@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.PlayLesson
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
@@ -27,5 +28,7 @@ object FilledIcons {
 
     val Settings = Icons.Filled.Settings
     val Add = Icons.Filled.Add
+    val PlayLesson = Icons.Filled.PlayLesson
+
 
 }

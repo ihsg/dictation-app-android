@@ -97,6 +97,11 @@ dependencies {
     // okhttp
     implementation(libs.okhttp)
 
+    // pinyin4j
+    implementation(libs.pinyin4j)
+
+    implementation(libs.icu4j)
+
 
     // test
     testImplementation(libs.junit)

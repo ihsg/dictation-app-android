@@ -40,5 +40,5 @@ data class WordEntity(
      * 1. it is the "strokeCount" in Chinese, such as "9+4+4+8=25".
      * 2. it is the "count" of letters of the word in English, such as "5".
      */
-    val count: String
+    val count: Int
 )

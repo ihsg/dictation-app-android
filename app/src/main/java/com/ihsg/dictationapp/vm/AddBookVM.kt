@@ -27,7 +27,7 @@ class AddBookVM @Inject constructor(
                 logger.e { "the book name is null or empty" }
                 return@launch
             }
-            bookRepository.add(BookEntity(name = bookName))
+//            bookRepository.add(BookEntity(name = bookName))
             _pageStateFlow.value = PageState.Finish
         }
     }

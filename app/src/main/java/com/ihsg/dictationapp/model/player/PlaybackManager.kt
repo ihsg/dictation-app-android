@@ -3,6 +3,8 @@ package com.ihsg.dictationapp.model.player
 import android.content.Context
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import com.ihsg.dictationapp.ext.isChinese
+import com.ihsg.dictationapp.model.db.entity.WordEntity
 import com.ihsg.dictationapp.model.log.Logger
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -30,10 +32,10 @@ class PlaybackManager @Inject constructor(
     private val _currentWordIndex = MutableStateFlow(0)
     val currentWordIndex: StateFlow<Int> = _currentWordIndex
 
-    private val _wordList = MutableStateFlow<List<String>>(emptyList())
-    val wordList: StateFlow<List<String>> = _wordList
+    private val _wordList = MutableStateFlow<List<WordEntity>>(emptyList())
+    val wordList: StateFlow<List<WordEntity>> = _wordList
 
-    private val _intervalTime = MutableStateFlow(5000L)
+    private val _intervalTime = MutableStateFlow(10 * 1000L)
     val intervalTime: StateFlow<Long> = _intervalTime
 
     private val _speechRate = MutableStateFlow(1f)
@@ -45,12 +47,13 @@ class PlaybackManager @Inject constructor(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
+    private var times = 0
+
     fun initialize() {
         textToSpeech = TextToSpeech(context) { status ->
             logger.d { "initialize called: status=$status" }
 
             if (status == TextToSpeech.SUCCESS) {
-                setLanguage(Locale.US)
                 setupUtteranceListener()
             }
         }
@@ -66,7 +69,11 @@ class PlaybackManager @Inject constructor(
                 logger.d { "onDone called: utteranceId=$utteranceId" }
 
                 if (_playbackState.value == PlaybackState.PLAYING) {
-                    scheduleNextWord()
+                    times++
+                    if (times == 2) {
+                        times = 0
+                        scheduleNextWord()
+                    }
                 }
             }
 
@@ -84,7 +91,7 @@ class PlaybackManager @Inject constructor(
         return textToSpeech?.setLanguage(locale) == TextToSpeech.LANG_AVAILABLE
     }
 
-    fun setWords(words: List<String>) {
+    fun setWords(words: List<WordEntity>) {
         _wordList.value = words
         _currentWordIndex.value = 0
         _playbackState.value = PlaybackState.STOPPED
@@ -112,9 +119,7 @@ class PlaybackManager @Inject constructor(
                 speakCurrentWord()
             }
 
-            PlaybackState.PLAYING -> {
-
-            }
+            PlaybackState.PLAYING -> {}
         }
     }
 
@@ -184,21 +189,35 @@ class PlaybackManager @Inject constructor(
     private fun speakCurrentWord() {
         val word = _wordList.value.getOrNull(_currentWordIndex.value) ?: return
 
+        speakText(word.word)
+        if (word.word.isChinese().not()) {
+            speakText(word.tips)
+        }
+    }
+
+    private fun speakText(text: String) {
+
+        if (text.isChinese()) {
+            setLanguage(Locale.CHINESE)
+        } else {
+            setLanguage(Locale.ENGLISH)
+        }
+
         val result = textToSpeech?.speak(
-            word,
-            TextToSpeech.QUEUE_FLUSH,
+            text,
+            TextToSpeech.QUEUE_ADD,
             null,
-            "word_${_currentWordIndex.value}"
+            "word_${_currentWordIndex.value}_${text.hashCode()}"
         )
 
         when (result) {
             TextToSpeech.ERROR -> {
-                logger.e { "Failed to speak text: $word" }
+                logger.e { "Failed to speak text: $text" }
                 _errorMessage.value = "无法播放语音"
             }
 
             TextToSpeech.SUCCESS -> {
-                logger.d { "Successfully queued speech: $word" }
+                logger.d { "Successfully queued speech: $text" }
                 _errorMessage.value = null
             }
 

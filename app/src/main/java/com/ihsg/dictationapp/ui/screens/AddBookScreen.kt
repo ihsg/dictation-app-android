@@ -1,5 +1,6 @@
 package com.ihsg.dictationapp.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -26,19 +25,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ihsg.dictationapp.model.config.PageState
 import com.ihsg.dictationapp.ui.components.ActionButton
-import com.ihsg.dictationapp.ui.components.FloatingActionBar
 import com.ihsg.dictationapp.ui.components.TopBar
-import com.ihsg.dictationapp.ui.icon.FilledIcons
 import com.ihsg.dictationapp.ui.nav.LocalNavHostController
-import com.ihsg.dictationapp.ui.nav.PlayerSettingsPage
 import com.ihsg.dictationapp.vm.AddBookVM
-import com.ihsg.dictationapp.vm.BookVM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,6 +41,7 @@ fun AddBookScreen(
     viewModel: AddBookVM = hiltViewModel()
 ) {
     val navController = LocalNavHostController.current
+
     val pageState by viewModel.pageStateFlow.collectAsState()
     var text by remember { mutableStateOf("") }
 
@@ -59,7 +54,7 @@ fun AddBookScreen(
     Scaffold(
         topBar = {
             TopBar(
-                title = "添加科目",
+                title = "添加教材",
                 navigationIcon = { ActionButton(onClick = { navController.popBackStack() }) }
             )
         },
@@ -68,13 +63,18 @@ fun AddBookScreen(
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .background(MaterialTheme.colorScheme.onPrimary)
         ) {
-            Card {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Card(
+                modifier = Modifier.padding(horizontal = 16.dp)
+            ) {
                 Column(
-                    modifier = Modifier.padding(24.dp)
+                    modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        "科目名称",
+                        "教材名称",
                         style = MaterialTheme.typography.titleMedium
                     )
 
@@ -100,7 +100,7 @@ fun AddBookScreen(
                             ) {
                                 if (text.isEmpty()) {
                                     Text(
-                                        "请输入要添加的科目名称，例如：江苏译林版小学英语",
+                                        "请输入要添加的教材名称，例如：江苏译林版小学英语",
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         fontSize = 16.sp
                                     )
@@ -110,7 +110,7 @@ fun AddBookScreen(
                         }
                     )
 
-                    Spacer(modifier = Modifier.height(60.dp))
+                    Spacer(modifier = Modifier.height(30.dp))
 
                     Button(
                         modifier = Modifier.fillMaxWidth(),

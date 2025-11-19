@@ -1,5 +1,6 @@
 package com.ihsg.dictationapp.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,16 +21,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import com.ihsg.dictationapp.model.player.PlaybackState
 import com.ihsg.dictationapp.ui.components.ActionButton
 import com.ihsg.dictationapp.ui.components.TopBar
@@ -41,18 +42,17 @@ import com.ihsg.dictationapp.vm.PlayerVM
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerScreen(
+    bookId: Long,
+    gradeId: Long,
+    lessonId: Long,
     modifier: Modifier = Modifier,
     viewModel: PlayerVM = hiltViewModel()
 ) {
     val navController = LocalNavHostController.current
 
-    // 示例单词列表
-    val sampleWords = remember {
-        listOf(
-            "apple", "banana", "computer", "dictionary", "elephant",
-            "fantastic", "garden", "happiness", "internet", "journey"
-        )
-    }
+    val book by viewModel.bookStateFlow.collectAsState()
+    val grade by viewModel.gradeStateFlow.collectAsState()
+    val lesson by viewModel.lessonStateFlow.collectAsState()
 
     val playbackState by viewModel.playbackState.collectAsState()
     val currentWordIndex by viewModel.currentWordIndex.collectAsState()
@@ -61,39 +61,41 @@ fun PlayerScreen(
     val speechRate by viewModel.speechRate.collectAsState()
     val pitch by viewModel.pitch.collectAsState()
 
-    LaunchedEffect(Unit) {
-        if (wordList.isEmpty()) {
-            viewModel.initialize()
-            viewModel.setWords(sampleWords)
-        }
+    LifecycleEventEffect(event = Lifecycle.Event.ON_CREATE) {
+        viewModel.initialize(bookId, gradeId, lessonId)
     }
 
-    Scaffold(topBar = {
-        TopBar(title = "播放器",
-            actions = {
-                ActionButton(imageVector = FilledIcons.Settings) {
-                    navController.navigate(PlayerSettingsPage.path)
-                }
-            })
-    }) { paddingValues ->
+    Scaffold(
+        topBar = {
+            TopBar(
+                title = "听写播放器",
+                navigationIcon = { ActionButton(onClick = { navController.popBackStack() }) },
+                actions = {
+                    ActionButton(imageVector = FilledIcons.Settings) {
+                        navController.navigate(PlayerSettingsPage.path)
+                    }
+                })
+        }) { paddingValues ->
         Column(
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .background(MaterialTheme.colorScheme.onPrimary)
         ) {
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 24.dp)
+                    .padding(horizontal = 16.dp)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Text(
-                    text = "第1课 白鹭",
-                    style = MaterialTheme.typography.displayLarge,
+                    text = "${book?.name} > ${grade?.name} > ${lesson?.name}",
+                    modifier = Modifier.fillMaxWidth(),
                     fontWeight = FontWeight.Normal,
-                    fontSize = 26.sp
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -106,11 +108,12 @@ fun PlayerScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = wordList.getOrNull(currentWordIndex) ?: "暂无单词",
+                            text = wordList.getOrNull(currentWordIndex)?.tips ?: "暂无单词",
                             style = MaterialTheme.typography.displayLarge,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 60.sp
+                            fontSize = 40.sp
                         )
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -123,7 +126,7 @@ fun PlayerScreen(
 
                             Text(
                                 text = "${currentWordIndex + 1} / ${wordList.size}",
-                                style = MaterialTheme.typography.bodySmall,
+                                style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(start = 8.dp)
                             )

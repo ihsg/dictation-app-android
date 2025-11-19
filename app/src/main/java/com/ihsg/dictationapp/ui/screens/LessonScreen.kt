@@ -1,9 +1,11 @@
 package com.ihsg.dictationapp.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,7 +31,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.ihsg.dictationapp.ui.components.ActionButton
 import com.ihsg.dictationapp.ui.components.FloatingActionBar
 import com.ihsg.dictationapp.ui.components.TopBar
-import com.ihsg.dictationapp.ui.nav.AddGradePageRoute
 import com.ihsg.dictationapp.ui.nav.AddLessonPageRoute
 import com.ihsg.dictationapp.ui.nav.LocalNavHostController
 import com.ihsg.dictationapp.ui.nav.WordPageRoute
@@ -75,15 +77,18 @@ fun LessonScreen(
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .background(MaterialTheme.colorScheme.onPrimary)
         ) {
+            Spacer(modifier = Modifier.height(16.dp))
+
             Text(
                 text = "${book?.name} > ${grade?.name}",
-                modifier = Modifier.padding(horizontal = 24.dp),
-                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 16.dp),
+                fontWeight = FontWeight.Normal,
             )
 
             LazyColumn(
-                modifier = Modifier.padding(horizontal = 24.dp),
+                modifier = Modifier.padding(horizontal = 16.dp),
                 contentPadding = PaddingValues(vertical = 10.dp),
             ) {
 

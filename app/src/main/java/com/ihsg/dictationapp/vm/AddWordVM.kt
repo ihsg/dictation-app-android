@@ -83,7 +83,7 @@ class AddWordVM @Inject constructor(
                     lessonId = lessonId,
                     word = word,
                     tips = tips,
-                    count = count
+                    count = count.toInt()
                 )
             )
 
