@@ -6,6 +6,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowLeft
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.PlayLesson
@@ -29,6 +30,5 @@ object FilledIcons {
     val Settings = Icons.Filled.Settings
     val Add = Icons.Filled.Add
     val PlayLesson = Icons.Filled.PlayLesson
-
-
+    val Menu = Icons.Filled.Menu
 }

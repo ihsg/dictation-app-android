@@ -18,6 +18,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -54,6 +55,13 @@ class PlayerVM @Inject constructor(
             emptyList()
         )
 
+    val wordListFinished = playbackManager.wordListFinished
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            false
+        )
+
     val intervalTime = playbackManager.intervalTime
         .stateIn(
             viewModelScope,
@@ -81,8 +89,14 @@ class PlayerVM @Inject constructor(
     private val _gradeStateFlow = MutableStateFlow<GradeEntity?>(null)
     val gradeStateFlow = _gradeStateFlow.asStateFlow()
 
+    private val _lessonsStateFlow = MutableStateFlow<List<LessonEntity>>(emptyList())
+    val lessonsStateFlow = _lessonsStateFlow.asStateFlow()
+
     private val _lessonStateFlow = MutableStateFlow<LessonEntity?>(null)
     val lessonStateFlow = _lessonStateFlow.asStateFlow()
+
+    private val _showLessonsStateFlow = MutableStateFlow(false)
+    val showLessonsStateFlow = _showLessonsStateFlow.asStateFlow()
 
     fun initialize(bookId: Long, gradeId: Long, lessonId: Long) {
         logger.i { "initialize called: bookId=$bookId, gradeId=$gradeId, lessonId=$lessonId" }
@@ -90,17 +104,41 @@ class PlayerVM @Inject constructor(
         viewModelScope.launch {
             val bookDeferred = async { bookRepository.loadById(bookId) }
             val gradeDeferred = async { gradeRepository.loadById(bookId, gradeId) }
+            val lessonsDeferred = async { lessonRepository.loadAll(bookId, gradeId) }
             val lessonDeferred = async { lessonRepository.loadById(bookId, gradeId, lessonId) }
             val wordsDeferred = async { wordRepository.loadAll(bookId, gradeId, lessonId) }
 
             _bookStateFlow.value = bookDeferred.await()
             _gradeStateFlow.value = gradeDeferred.await()
+            _lessonsStateFlow.value = lessonsDeferred.await() ?: emptyList()
+            _lessonStateFlow.value = lessonDeferred.await()
+            val words = wordsDeferred.await().orEmpty()
+            if (words.isNotEmpty()) {
+                playbackManager.setWords(words)
+            }
+
+            wordListFinished.collectLatest { finished ->
+                if (finished) {
+                    loadWords(bookId, gradeId, lessonId + 1)
+                }
+            }
+        }
+    }
+
+    fun loadWords(bookId: Long, gradeId: Long, lessonId: Long) {
+        viewModelScope.launch {
+            val lessonDeferred = async { lessonRepository.loadById(bookId, gradeId, lessonId) }
+            val wordsDeferred = async { wordRepository.loadAll(bookId, gradeId, lessonId) }
             _lessonStateFlow.value = lessonDeferred.await()
             val words = wordsDeferred.await().orEmpty()
             if (words.isNotEmpty()) {
                 playbackManager.setWords(words)
             }
         }
+    }
+
+    fun changeLessonsState() {
+        _showLessonsStateFlow.value = _showLessonsStateFlow.value.not()
     }
 
     fun play() {

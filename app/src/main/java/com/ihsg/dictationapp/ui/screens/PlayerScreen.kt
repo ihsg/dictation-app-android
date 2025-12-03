@@ -1,20 +1,26 @@
 package com.ihsg.dictationapp.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +39,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import com.ihsg.dictationapp.model.player.PlaybackState
 import com.ihsg.dictationapp.ui.components.ActionButton
+import com.ihsg.dictationapp.ui.components.LargeIcon
 import com.ihsg.dictationapp.ui.components.TopBar
 import com.ihsg.dictationapp.ui.icon.FilledIcons
 import com.ihsg.dictationapp.ui.nav.LocalNavHostController
@@ -53,16 +60,22 @@ fun PlayerScreen(
     val book by viewModel.bookStateFlow.collectAsState()
     val grade by viewModel.gradeStateFlow.collectAsState()
     val lesson by viewModel.lessonStateFlow.collectAsState()
+    val lessons by viewModel.lessonsStateFlow.collectAsState()
+    val wordList by viewModel.wordList.collectAsState()
+    val showLessons by viewModel.showLessonsStateFlow.collectAsState()
 
     val playbackState by viewModel.playbackState.collectAsState()
     val currentWordIndex by viewModel.currentWordIndex.collectAsState()
-    val wordList by viewModel.wordList.collectAsState()
     val intervalTime by viewModel.intervalTime.collectAsState()
     val speechRate by viewModel.speechRate.collectAsState()
     val pitch by viewModel.pitch.collectAsState()
 
     LifecycleEventEffect(event = Lifecycle.Event.ON_CREATE) {
         viewModel.initialize(bookId, gradeId, lessonId)
+    }
+
+    LifecycleEventEffect(event = Lifecycle.Event.ON_PAUSE) {
+        viewModel.stop()
     }
 
     Scaffold(
@@ -82,148 +95,204 @@ fun PlayerScreen(
                 .padding(paddingValues)
                 .background(MaterialTheme.colorScheme.onPrimary)
         ) {
-            Column(
-                modifier = Modifier
+
+            Box(
+                modifier = modifier
                     .weight(1f)
-                    .padding(horizontal = 16.dp)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxWidth()
             ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
 
-                Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                Text(
-                    text = "${book?.name} > ${grade?.name} > ${lesson?.name}",
-                    modifier = Modifier.fillMaxWidth(),
-                    fontWeight = FontWeight.Normal,
-                )
+                    Text(
+                        text = "${book?.name} > ${grade?.name} > ${lesson?.name}",
+                        modifier = Modifier.fillMaxWidth(),
+                        fontWeight = FontWeight.Normal,
+                    )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                Card {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = wordList.getOrNull(currentWordIndex)?.tips ?: "暂无单词",
-                            style = MaterialTheme.typography.displayLarge,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 40.sp
-                        )
-
-                        Row(
+                    Card {
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 36.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            LinearProgressIndicator(
-                                modifier = Modifier.weight(1f),
-                                progress = { (currentWordIndex + 1f) / wordList.size })
-
                             Text(
-                                text = "${currentWordIndex + 1} / ${wordList.size}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(start = 8.dp)
+                                text = wordList.getOrNull(currentWordIndex)?.tips ?: "暂无单词",
+                                style = MaterialTheme.typography.displayLarge,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 28.sp
+                            )
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 36.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                LinearProgressIndicator(
+                                    modifier = Modifier.weight(1f),
+                                    progress = { (currentWordIndex + 1f) / wordList.size })
+
+                                Text(
+                                    text = "${currentWordIndex + 1} / ${wordList.size}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(start = 8.dp)
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(top = 30.dp, bottom = 10.dp),
+                            text = "当前设置",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Text(
+                            text = "间隔时间: ${intervalTime / 1000L} 秒",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Text(
+                            text = "语音语速: ${"%.1f".format(speechRate)}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Text(
+                            text = "语音音调: ${"%.1f".format(pitch)}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+
+
+                if (showLessons) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        LazyColumn(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .heightIn(min = 100.dp, max = 300.dp)
+                                .background(MaterialTheme.colorScheme.onPrimary),
+                            contentPadding = PaddingValues(vertical = 10.dp),
+                        ) {
+                            items(lessons, key = { it.id }) { lesson ->
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(60.dp)
+                                        .wrapContentHeight(Alignment.CenterVertically)
+                                        .clickable {
+                                            viewModel.loadWords(bookId, gradeId, lesson.id)
+                                            viewModel.changeLessonsState()
+                                        },
+                                ) {
+                                    Text(
+                                        text = lesson.name,
+                                        fontWeight = FontWeight.Normal,
+                                        fontSize = 18.sp,
+                                    )
+                                }
+                                HorizontalDivider()
+                            }
+                        }
+                    }
+                }
+            }
+
+            // playing controller
+            Row(
+                modifier = Modifier
+                    .height(60.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                // lessons
+                IconButton(onClick = { viewModel.changeLessonsState() }) {
+                    LargeIcon(
+                        imageVector = FilledIcons.Menu,
+                        desc = "课程列表"
+                    )
+                }
+
+                // Previous
+                IconButton(
+                    onClick = { viewModel.previous() },
+                    enabled = wordList.isNotEmpty()
+                ) {
+                    LargeIcon(
+                        imageVector = FilledIcons.SkipPrevious,
+                        desc = "上一个"
+                    )
+                }
+
+                // play/pause
+                when (playbackState) {
+                    PlaybackState.PLAYING -> {
+                        IconButton(
+                            onClick = { viewModel.pause() }
+                        ) {
+                            LargeIcon(
+                                imageVector = FilledIcons.Pause,
+                                desc = "暂停"
+                            )
+                        }
+                    }
+
+                    else -> {
+                        IconButton(
+                            onClick = { viewModel.play() },
+                            enabled = wordList.isNotEmpty()
+                        ) {
+                            LargeIcon(
+                                imageVector = FilledIcons.PlayArrow,
+                                desc = "播放"
                             )
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.Start
+                // next
+                IconButton(
+                    onClick = { viewModel.next() },
+                    enabled = wordList.isNotEmpty()
                 ) {
-                    Text(
-                        modifier = Modifier.padding(top = 30.dp, bottom = 10.dp),
-                        text = "当前设置",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Text(
-                        text = "间隔时间: ${intervalTime / 1000L} 秒",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Text(
-                        text = "语音语速: ${"%.1f".format(speechRate)}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Text(
-                        text = "语音音调: ${"%.1f".format(pitch)}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    LargeIcon(
+                        imageVector = FilledIcons.SkipNext,
+                        desc = "下一个"
                     )
                 }
-            }
 
-            // playing controller
-            Card {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Previous
-                    IconButton(
-                        onClick = { viewModel.previous() },
-                        enabled = wordList.isNotEmpty()
-                    ) {
-                        Icon(
-                            FilledIcons.SkipPrevious,
-                            contentDescription = "上一个",
-                            modifier = Modifier.size(48.dp)
-                        )
-                    }
-
-                    // play/pause
-                    when (playbackState) {
-                        PlaybackState.PLAYING -> {
-                            IconButton(
-                                onClick = { viewModel.pause() }
-                            ) {
-                                Icon(
-                                    FilledIcons.Pause,
-                                    contentDescription = "暂停",
-                                    modifier = Modifier.size(48.dp)
-                                )
-                            }
-                        }
-
-                        else -> {
-                            IconButton(
-                                onClick = { viewModel.play() },
-                                enabled = wordList.isNotEmpty()
-                            ) {
-                                Icon(
-                                    FilledIcons.PlayArrow,
-                                    contentDescription = "播放",
-                                    modifier = Modifier.size(48.dp)
-                                )
-                            }
-                        }
-                    }
-
-                    // next
-                    IconButton(
-                        onClick = { viewModel.next() },
-                        enabled = wordList.isNotEmpty()
-                    ) {
-                        Icon(
-                            FilledIcons.SkipNext,
-                            contentDescription = "下一个",
-                            modifier = Modifier.size(48.dp)
-                        )
-                    }
+                // stop
+                IconButton(onClick = { viewModel.stop() }) {
+                    LargeIcon(
+                        imageVector = FilledIcons.Stop,
+                        desc = "结束"
+                    )
                 }
             }
         }

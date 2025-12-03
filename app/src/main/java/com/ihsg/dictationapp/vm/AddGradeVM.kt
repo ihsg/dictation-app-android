@@ -1,9 +1,7 @@
 package com.ihsg.dictationapp.vm
 
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ihsg.dictationapp.model.config.PageState
 import com.ihsg.dictationapp.model.db.entity.BookEntity
 import com.ihsg.dictationapp.model.db.entity.GradeEntity
@@ -11,7 +9,6 @@ import com.ihsg.dictationapp.model.log.Logger
 import com.ihsg.dictationapp.model.repository.BookRepository
 import com.ihsg.dictationapp.model.repository.GradeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch

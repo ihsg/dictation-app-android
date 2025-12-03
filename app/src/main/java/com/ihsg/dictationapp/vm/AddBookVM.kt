@@ -10,6 +10,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.Locale
+import java.util.Locale.CHINESE
+import java.util.Locale.ENGLISH
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,7 +30,12 @@ class AddBookVM @Inject constructor(
                 logger.e { "the book name is null or empty" }
                 return@launch
             }
-//            bookRepository.add(BookEntity(name = bookName))
+            val language = if (bookName.contains("英语")) {
+                CHINESE.displayLanguage
+            } else {
+                ENGLISH.displayLanguage
+            }
+            bookRepository.add(BookEntity(name = bookName, language = language))
             _pageStateFlow.value = PageState.Finish
         }
     }

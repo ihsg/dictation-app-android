@@ -13,6 +13,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
@@ -27,33 +28,35 @@ class PlaybackManager @Inject constructor(
     private var job: Job? = null
 
     private val _playbackState = MutableStateFlow(PlaybackState.STOPPED)
-    val playbackState: StateFlow<PlaybackState> = _playbackState
+    val playbackState: StateFlow<PlaybackState> = _playbackState.asStateFlow()
 
     private val _currentWordIndex = MutableStateFlow(0)
-    val currentWordIndex: StateFlow<Int> = _currentWordIndex
+    val currentWordIndex: StateFlow<Int> = _currentWordIndex.asStateFlow()
 
     private val _wordList = MutableStateFlow<List<WordEntity>>(emptyList())
-    val wordList: StateFlow<List<WordEntity>> = _wordList
+    val wordList: StateFlow<List<WordEntity>> = _wordList.asStateFlow()
+
+    private val _wordListFinished = MutableStateFlow(false)
+    val wordListFinished: StateFlow<Boolean> = _wordListFinished.asStateFlow()
 
     private val _intervalTime = MutableStateFlow(10 * 1000L)
-    val intervalTime: StateFlow<Long> = _intervalTime
+    val intervalTime: StateFlow<Long> = _intervalTime.asStateFlow()
 
     private val _speechRate = MutableStateFlow(1f)
-    val speechRate: StateFlow<Float> = _speechRate
+    val speechRate: StateFlow<Float> = _speechRate.asStateFlow()
 
     private val _pitch = MutableStateFlow(1f)
-    val pitch: StateFlow<Float> = _pitch
+    val pitch: StateFlow<Float> = _pitch.asStateFlow()
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
-
-    private var times = 0
 
     fun initialize() {
         textToSpeech = TextToSpeech(context) { status ->
             logger.d { "initialize called: status=$status" }
 
             if (status == TextToSpeech.SUCCESS) {
+                setLanguage(Locale.CHINESE)
                 setupUtteranceListener()
             }
         }
@@ -69,11 +72,7 @@ class PlaybackManager @Inject constructor(
                 logger.d { "onDone called: utteranceId=$utteranceId" }
 
                 if (_playbackState.value == PlaybackState.PLAYING) {
-                    times++
-                    if (times == 2) {
-                        times = 0
-                        scheduleNextWord()
-                    }
+                    scheduleNextWord()
                 }
             }
 
@@ -146,6 +145,7 @@ class PlaybackManager @Inject constructor(
 
         val nextIndex = (_currentWordIndex.value + 1) % _wordList.value.size
         _currentWordIndex.value = nextIndex
+        _wordListFinished.value = nextIndex == 0
 
         if (_playbackState.value == PlaybackState.PLAYING) {
             speakCurrentWord()
@@ -189,25 +189,26 @@ class PlaybackManager @Inject constructor(
     private fun speakCurrentWord() {
         val word = _wordList.value.getOrNull(_currentWordIndex.value) ?: return
 
-        speakText(word.word)
-        if (word.word.isChinese().not()) {
-            speakText(word.tips)
+        val text = if (word.word.isChinese()) {
+            word.word
+        } else {
+            "${word.word}……${word.tips.replace("……", "什么什么")}"
         }
+
+        speakText(text)
     }
 
-    private fun speakText(text: String) {
-
-        if (text.isChinese()) {
-            setLanguage(Locale.CHINESE)
-        } else {
-            setLanguage(Locale.ENGLISH)
+    fun speakText(text: String) {
+        if (text.isBlank()) {
+            logger.e { "speakText called but text is $text" }
+            return
         }
 
         val result = textToSpeech?.speak(
             text,
-            TextToSpeech.QUEUE_ADD,
+            TextToSpeech.QUEUE_FLUSH,
             null,
-            "word_${_currentWordIndex.value}_${text.hashCode()}"
+            "word_${_currentWordIndex.value}"
         )
 
         when (result) {
@@ -250,8 +251,10 @@ class PlaybackManager @Inject constructor(
     }
 
     fun release() {
-        logger.w { "release callled" }
+        logger.w { "release called" }
+
         job?.cancel()
+
         textToSpeech?.stop()
         textToSpeech?.shutdown()
         textToSpeech = null
