@@ -5,6 +5,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
@@ -12,12 +13,13 @@ import androidx.compose.ui.unit.dp
 fun LargeIcon(
     imageVector: ImageVector,
     desc: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    tint: Color = MaterialTheme.colorScheme.outline
 ) {
     Icon(
         imageVector = imageVector,
         contentDescription = desc,
         modifier = modifier.size(32.dp),
-        tint = MaterialTheme.colorScheme.outline
+        tint = tint
     )
 }

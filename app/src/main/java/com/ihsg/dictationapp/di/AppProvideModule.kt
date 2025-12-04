@@ -6,6 +6,7 @@ import com.ihsg.dictationapp.model.db.AppDatabase
 import com.ihsg.dictationapp.model.db.dao.BookDao
 import com.ihsg.dictationapp.model.db.dao.GradeDao
 import com.ihsg.dictationapp.model.db.dao.LessonDao
+import com.ihsg.dictationapp.model.db.dao.RecordDao
 import com.ihsg.dictationapp.model.db.dao.WordDao
 import dagger.Module
 import dagger.Provides
@@ -51,4 +52,10 @@ object AppProvideModule {
     fun provideWordDao(
         appDatabase: AppDatabase
     ): WordDao = appDatabase.wordDao()
+
+    @Provides
+    @Singleton
+    fun provideRecordDao(
+        appDatabase: AppDatabase
+    ): RecordDao = appDatabase.recordDao()
 }

@@ -101,7 +101,7 @@ fun WordScreen(
                             .wrapContentHeight(Alignment.CenterVertically),
                     ) {
                         Text(
-                            text = "${word.word} (${word.tips}) (${word.count})",
+                            text = "${word.word} (${word.tips}) (${word.strokeCount})",
                             fontWeight = FontWeight.Normal,
                             fontSize = 18.sp,
                         )

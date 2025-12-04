@@ -6,6 +6,8 @@ import com.ihsg.dictationapp.model.repository.GradeRepository
 import com.ihsg.dictationapp.model.repository.GradeRepositoryImpl
 import com.ihsg.dictationapp.model.repository.LessonRepository
 import com.ihsg.dictationapp.model.repository.LessonRepositoryImpl
+import com.ihsg.dictationapp.model.repository.RecordRepository
+import com.ihsg.dictationapp.model.repository.RecordRepositoryImpl
 import com.ihsg.dictationapp.model.repository.WordRepository
 import com.ihsg.dictationapp.model.repository.WordRepositoryImpl
 import dagger.Binds
@@ -43,4 +45,10 @@ abstract class AppBindModule {
     abstract fun bindWordRepository(
         wordRepositoryImpl: WordRepositoryImpl
     ): WordRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindRecordRepository(
+        recordRepositoryImpl: RecordRepositoryImpl
+    ): RecordRepository
 }

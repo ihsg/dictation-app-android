@@ -71,7 +71,7 @@ class ChGrade5AutumnDataFactory @Inject constructor(
                         lessonId = lessonId,
                         word = word,
                         tips = hanziToPinyin(word),
-                        count = getHanziStrokeCount(word)
+                        strokeCount = getHanziStrokeCount(word)
                     )
                 )
             }

@@ -6,8 +6,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Keep
-@Entity(tableName = "word")
-data class WordEntity(
+@Entity(tableName = "record")
+data class RecordEntity(
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
@@ -21,6 +21,9 @@ data class WordEntity(
 
     @ColumnInfo(name = "lesson_id")
     val lessonId: Long,
+
+    @ColumnInfo(name = "word_id")
+    val wordId: Long,
 
     /**
      * It is real thing that is checked in the dictation:
@@ -41,5 +44,9 @@ data class WordEntity(
      * 1. it is the "strokeCount" in Chinese, such as "9+4+4+8=25".
      * 2. it is the "strokeCount" of letters of the word in English, such as "5".
      */
-    val strokeCount: Int
+    val strokeCount: Int,
+
+    val timesOnWrong: Int,
+
+    val timesOnRight: Int,
 )

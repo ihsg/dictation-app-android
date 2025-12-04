@@ -31,7 +31,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -44,17 +46,17 @@ import com.ihsg.dictationapp.ui.components.TopBar
 import com.ihsg.dictationapp.ui.icon.FilledIcons
 import com.ihsg.dictationapp.ui.nav.LocalNavHostController
 import com.ihsg.dictationapp.ui.nav.PlayerSettingsPage
-import com.ihsg.dictationapp.ui.nav.ValidationPageRoute
 import com.ihsg.dictationapp.vm.PlayerVM
+import com.ihsg.dictationapp.vm.ValidationVM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlayerScreen(
+fun ValidationScreen(
     bookId: Long,
     gradeId: Long,
     lessonId: Long,
     modifier: Modifier = Modifier,
-    viewModel: PlayerVM = hiltViewModel()
+    viewModel: ValidationVM = hiltViewModel()
 ) {
     val navController = LocalNavHostController.current
 
@@ -64,31 +66,18 @@ fun PlayerScreen(
     val lessons by viewModel.lessonsStateFlow.collectAsState()
     val wordList by viewModel.wordList.collectAsState()
     val showLessons by viewModel.showLessonsStateFlow.collectAsState()
-
-    val playbackState by viewModel.playbackState.collectAsState()
     val currentWordIndex by viewModel.currentWordIndex.collectAsState()
-    val intervalTime by viewModel.intervalTime.collectAsState()
-    val speechRate by viewModel.speechRate.collectAsState()
-    val pitch by viewModel.pitch.collectAsState()
 
     LifecycleEventEffect(event = Lifecycle.Event.ON_CREATE) {
         viewModel.initialize(bookId, gradeId, lessonId)
     }
 
-    LifecycleEventEffect(event = Lifecycle.Event.ON_PAUSE) {
-        viewModel.stop()
-    }
-
     Scaffold(
         topBar = {
             TopBar(
-                title = "听写播放器",
+                title = "听写结果校验",
                 navigationIcon = { ActionButton(onClick = { navController.popBackStack() }) },
-                actions = {
-                    ActionButton(imageVector = FilledIcons.Settings) {
-                        navController.navigate(PlayerSettingsPage.path)
-                    }
-                })
+            )
         }) { paddingValues ->
         Column(
             modifier = modifier
@@ -128,7 +117,11 @@ fun PlayerScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = wordList.getOrNull(currentWordIndex)?.tips ?: "暂无单词",
+                                text = wordList.getOrNull(currentWordIndex)?.let {
+                                    it.word + "\n" + it.tips
+                                } ?: "暂无单词",
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center,
                                 style = MaterialTheme.typography.displayLarge,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 28.sp
@@ -146,44 +139,14 @@ fun PlayerScreen(
 
                                 Text(
                                     text = "${currentWordIndex + 1} / ${wordList.size}",
-                                    style = MaterialTheme.typography.bodyMedium,
+                                    style = MaterialTheme.typography.bodyLarge,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.padding(start = 8.dp)
+                                    modifier = Modifier.padding(start = 16.dp)
                                 )
                             }
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.Start
-                    ) {
-                        Text(
-                            modifier = Modifier.padding(top = 30.dp, bottom = 10.dp),
-                            text = "当前设置",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Text(
-                            text = "间隔时间: ${intervalTime / 1000L} 秒",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Text(
-                            text = "语音语速: ${"%.1f".format(speechRate)}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Text(
-                            text = "语音音调: ${"%.1f".format(pitch)}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
                 }
-
 
                 if (showLessons) {
                     Column(
@@ -251,32 +214,6 @@ fun PlayerScreen(
                     )
                 }
 
-                // play/pause
-                when (playbackState) {
-                    PlaybackState.PLAYING -> {
-                        IconButton(
-                            onClick = { viewModel.pause() }
-                        ) {
-                            LargeIcon(
-                                imageVector = FilledIcons.Pause,
-                                desc = "暂停"
-                            )
-                        }
-                    }
-
-                    else -> {
-                        IconButton(
-                            onClick = { viewModel.play() },
-                            enabled = wordList.isNotEmpty()
-                        ) {
-                            LargeIcon(
-                                imageVector = FilledIcons.PlayArrow,
-                                desc = "播放"
-                            )
-                        }
-                    }
-                }
-
                 // next
                 IconButton(
                     onClick = { viewModel.next() },
@@ -288,20 +225,19 @@ fun PlayerScreen(
                     )
                 }
 
-                // stop
-                IconButton(onClick = {
-                    viewModel.stop()
-                    navController.navigate(
-                        ValidationPageRoute.getPathWithArgs(
-                            bookId = bookId,
-                            gradeId = gradeId,
-                            lessonId = lesson?.id ?: lessonId
-                        )
-                    )
-                }) {
+                IconButton(onClick = { viewModel.onWrong() }) {
                     LargeIcon(
-                        imageVector = FilledIcons.Stop,
-                        desc = "结束"
+                        imageVector = FilledIcons.Cancel,
+                        desc = "错误",
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
+
+                IconButton(onClick = { viewModel.onRight() }) {
+                    LargeIcon(
+                        imageVector = FilledIcons.CheckCircle,
+                        desc = "正确",
+                        tint = Color.Green
                     )
                 }
             }

@@ -61,7 +61,7 @@ class EnGrade5AutumnDataFactory @Inject constructor(
                         lessonId = lessonId,
                         word = word.first,
                         tips = word.second,
-                        count = word.first.length
+                        strokeCount = word.first.length
                     )
                 )
             }

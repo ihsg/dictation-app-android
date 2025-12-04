@@ -157,4 +157,29 @@ data object PlayerPageRoute : AppNavRoute(
         "player?$ARG_BOOK_ID=$bookId&$ARG_GRADE_ID=$gradeId&$ARG_LESSON_ID=$lessonId"
 }
 
+data object ValidationPageRoute : AppNavRoute(
+    "validation?$ARG_BOOK_ID={$ARG_BOOK_ID}&$ARG_GRADE_ID={$ARG_GRADE_ID}&$ARG_LESSON_ID={$ARG_LESSON_ID}"
+){
+    fun getArguments() = listOf(
+        navArgument(ARG_BOOK_ID) {
+            type = NavType.LongType
+            defaultValue = 0L
+        },
+        navArgument(ARG_GRADE_ID) {
+            type = NavType.LongType
+            defaultValue = 0L
+        },
+        navArgument(ARG_LESSON_ID) {
+            type = NavType.LongType
+            defaultValue = 0L
+        }
+    )
+
+    fun getBookId(arguments: Bundle?) = arguments?.getLong(ARG_BOOK_ID) ?: 0L
+    fun getGradeId(arguments: Bundle?) = arguments?.getLong(ARG_GRADE_ID) ?: 0L
+    fun getLessonId(arguments: Bundle?) = arguments?.getLong(ARG_LESSON_ID) ?: 0L
+    fun getPathWithArgs(bookId: Long, gradeId: Long, lessonId: Long): String =
+        "validation?$ARG_BOOK_ID=$bookId&$ARG_GRADE_ID=$gradeId&$ARG_LESSON_ID=$lessonId"
+}
+
 data object PlayerSettingsPage : AppNavRoute("player_settings")

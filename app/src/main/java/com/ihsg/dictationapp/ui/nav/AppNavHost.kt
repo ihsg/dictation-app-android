@@ -14,6 +14,7 @@ import com.ihsg.dictationapp.ui.screens.GradeScreen
 import com.ihsg.dictationapp.ui.screens.LessonScreen
 import com.ihsg.dictationapp.ui.screens.PlayerScreen
 import com.ihsg.dictationapp.ui.screens.PlayerSettingsScreen
+import com.ihsg.dictationapp.ui.screens.ValidationScreen
 import com.ihsg.dictationapp.ui.screens.WordScreen
 
 @Composable
@@ -104,6 +105,17 @@ fun AppNavHost(
                     bookId = PlayerPageRoute.getBookId(it.arguments),
                     gradeId = PlayerPageRoute.getGradeId(it.arguments),
                     lessonId = PlayerPageRoute.getLessonId(it.arguments)
+                )
+            }
+
+            composable(
+                route = ValidationPageRoute.path,
+                arguments = ValidationPageRoute.getArguments()
+            ) {
+                ValidationScreen(
+                    bookId = ValidationPageRoute.getBookId(it.arguments),
+                    gradeId = ValidationPageRoute.getGradeId(it.arguments),
+                    lessonId = ValidationPageRoute.getLessonId(it.arguments)
                 )
             }
 
